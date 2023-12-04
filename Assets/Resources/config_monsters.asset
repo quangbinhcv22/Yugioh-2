@@ -1,0 +1,540 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b8336ae62c408cb8834bd83767af69, type: 3}
+  m_Name: config_monsters
+  m_EditorClassIdentifier: 
+  configs:
+  - id: 549481
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 1784619
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 2483611
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 3134241
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 3573512
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 4042268
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 5434080
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 5464695
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 5818798
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 9159938
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 10202894
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 10992251
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 11091375
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 11321183
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 11549357
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 11987744
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 12493482
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 13039848
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 13429800
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 13723605
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 14531242
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 14851496
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 14898066
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 15025844
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 15734813
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 17535588
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 20721928
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 21615956
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 21844576
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 22026707
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 23635815
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 23771716
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 25652259
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 27125110
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 30532390
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 30655537
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 32452818
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 33064647
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 35052053
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 36119641
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 36304921
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 37313348
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 38142739
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 39256679
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 40374923
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 41392891
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 41396436
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 43096270
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 43500484
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 46821314
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 47060154
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 48305365
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 49003308
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 49218300
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 49791927
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 50930991
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 51934376
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 54579801
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 56342351
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 58831685
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 58932615
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 62651957
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 64428736
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 65570596
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 66602787
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 66672569
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 67105242
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 68049471
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 68516705
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 69140098
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 69247929
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 69380702
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 70924884
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 71407486
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 75953262
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 76446915
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 77456781
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 80770678
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 83464209
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 84327329
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 84620194
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 84696266
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 85639257
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 85705804
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 86325596
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 86569121
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 86652646
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 87303357
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 87564352
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 87796900
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 88819587
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 89904598
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 90357090
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 91152256
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 91939608
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 91996584
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 92667214
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 92731455
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 93221206
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 93553943
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 95511642
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 97590747
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 98818516
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 99261403
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
+  - id: 99785935
+    attribute: 0
+    types: 0
+    attack: 0
+    defense: 0
