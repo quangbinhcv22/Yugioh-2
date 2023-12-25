@@ -8,7 +8,6 @@ namespace Networks
     public class NetworkConnection : MonoBehaviour
     {
         [ShowInInspector] public static WebSocket ws;
-
         [ShowInInspector] public static string messageToSend;
 
         [Button]
@@ -16,6 +15,9 @@ namespace Networks
         {
             Network.Send(messageToSend);
         }
+
+
+        // public b
 
         public static async void Connect()
         {
@@ -26,12 +28,18 @@ namespace Networks
             ws.OnClose += WsOnClose;
             ws.OnMessage += WsOnMessage;
 
-
-            // Keep sending messages at every 0.3s
-            // InvokeRepeating("SendWebSocketMessage", 0.0f, 0.3f);
-
             Debug.Log("Connecting...");
             await ws.Connect();
+        }
+
+
+        public static bool IsReconnecting { get; set; }
+
+        public static async void Reconnect()
+        {
+            Debug.Log("Reconnect...");
+            IsReconnecting = true;
+            Connect();
         }
 
 
@@ -59,6 +67,11 @@ namespace Networks
         private static void WsOnOpen()
         {
             Debug.Log("WS Open");
+
+            if (IsReconnecting)
+            {
+                Network.Request.LoginByPassword(Network.Cached.cachedLoginRequest);
+            }
         }
 
         private static void WsOnError(string errorMsg)
@@ -75,7 +88,7 @@ namespace Networks
         {
             var message = Encoding.UTF8.GetString(bytes);
             // Debug.Log($"WS Message: {message}");
-            
+
             Network.OnMessage(message);
         }
 

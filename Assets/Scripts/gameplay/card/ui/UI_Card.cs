@@ -1,24 +1,26 @@
 using System;
+using System.Collections.Generic;
 using battle.define;
 using Cysharp.Threading.Tasks;
 using event_name;
-using Gameplay.card.core;
 using Networks;
 using Sirenix.OdinInspector;
 using TigerForge;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using UX;
+using Network = Networks.Network;
 
 namespace Gameplay.card.ui
 {
-    [Obsolete]
     public class UI_Card : MonoBehaviour
     {
         [SerializeField] private TMP_Text txtName;
         [SerializeField] private TMP_Text txtLType;
+        [SerializeField] private TMP_Text txtCardType;
         [SerializeField] private TMP_Text txtLevel;
         [SerializeField] private Image imgAttribute;
         [SerializeField] private StarsView levelView;
@@ -30,6 +32,9 @@ namespace Gameplay.card.ui
         [SerializeField] private TMP_Text txtDef;
         [SerializeField] private CardTheme theme;
         [SerializeField] private Button button;
+        [SerializeField] private Image background;
+
+        [SerializeField] private List<GameObject> monsterObjs;
 
         [ShowInInspector, HideInEditorMode] public string Guid { get; set; }
 
@@ -54,6 +59,17 @@ namespace Gameplay.card.ui
             }
         }
 
+        public void ViewOnly_ByCode(string code)
+        {
+            if (string.IsNullOrEmpty(code))
+            {
+            }
+            else
+            {
+                SetData(Network.Query.Config.GetCard(code));
+            }
+        }
+
         public void Binding(string guild)
         {
             Guid = guild;
@@ -67,6 +83,13 @@ namespace Gameplay.card.ui
             }
 
             DueCardQuery.SetUICard(guild, this);
+        }
+
+        public void OnRevealed(string code)
+        {
+            Debug.Log(Guid, gameObject);
+            ViewOnly_ByCode(code);
+            // SetData(DueCardQuery.GetViewInfo(Guid));
         }
 
 
@@ -92,6 +115,12 @@ namespace Gameplay.card.ui
             flipper.ShowBack();
         }
 
+        public void HandleChangePosition_OnBack()
+        {
+            ViewOnly(Guid);
+        }
+
+
         public void ShowHide()
         {
             var flipper = GetComponent<FlipCard>();
@@ -113,45 +142,93 @@ namespace Gameplay.card.ui
 
         private async void SetData(CardConfig card)
         {
-            // var typeCard = FakeConfig.GetType_ById(card.id);
-            if (card.type == "MONSTER")
+            if (DueCardQuery.IsAnonymousCode(card.code)) return;
+
+            var cardType = Networks.Network.Query.Config.GetType_ByCode(card.code);
+
+
+            var isMonster = cardType is CardType.Monster;
+
+            if (imgAttribute) imgAttribute.gameObject.SetActive(isMonster);
+            if (txtAtk) txtAtk.gameObject.SetActive(isMonster);
+            if (txtDef) txtDef.gameObject.SetActive(isMonster);
+            if (levelView) levelView.gameObject.SetActive(isMonster);
+            if (txtLevel) txtLevel.gameObject.SetActive(isMonster);
+
+            if (isMonster)
             {
-                if (illustrationTemp) illustrationTemp.gameObject.SetActive(false);
-
-
                 if (imgAttribute)
                 {
                     var attKey = $"attribute_{card.monsterAttribute.ToLower()}";
                     imgAttribute.sprite = await Addressables.LoadAssetAsync<Sprite>(attKey);
+
+                    if (txtAtk) txtAtk.SetText($"{card.atk}");
+                    if (txtDef) txtDef.SetText($"{card.def}");
+                    if (levelView) levelView.Set(card.level);
+                    if (txtLevel) txtLevel.SetText($"{card.level}");
                 }
-
-                if (illustration)
-                    illustration.sprite = await Addressables.LoadAssetAsync<Sprite>(FakeConfig.GetIllusKey(card.code));
-                if (txtName) txtName.SetText(card.name);
-                if (txtLore) txtLore.SetText(card.desc);
-
-                if (txtTypes) txtTypes.SetText(card.monsterType);
-
-                if (txtAtk) txtAtk.SetText($"{card.atk}");
-                if (txtDef) txtDef.SetText($"{card.def}");
-
-                if (levelView) levelView.Set(card.level);
-                if (txtLevel) txtLevel.SetText($"{card.level}");
             }
-            // else
-            // {
-            //     if (illustrationTemp)
-            //     {
-            //         illustrationTemp.gameObject.SetActive(true);
-            //         illustrationTemp.sprite = await Addressables.LoadAssetAsync<Sprite>(FakeConfig.GetIllusKey(card.id));
-            //     }
-            // }
+
+            monsterObjs.ForEach(o => o.SetActive(isMonster));
+
+            LoadIllus(card);
+
+            if (txtCardType)
+            {
+                txtCardType.SetText((cardType) switch
+                {
+                    CardType.Monster => "NORMAL",
+                    CardType.Spell => "SPELL",
+                    _ => "",
+                });
+            }
+
+
+
+            if (txtName) txtName.SetText(card.name);
+            if (txtLore) txtLore.SetText(card.desc);
+
+            if (txtTypes) txtTypes.SetText(card.monsterType);
         }
 
         private void Select()
         {
             EventManager.EmitEventData(EventName.SelectCard, this);
             PresentHandler_SelectCard.Current.Select(Guid);
+        }
+
+
+        private bool _isLoadingIllus;
+
+        private async void LoadIllus(CardConfig card)
+        {
+            // if(_isLoadingIllus) return;
+            // _isLoadingIllus = true;
+
+            Addressables.LoadAssetAsync<Sprite>(FakeConfig.GetIllusKey(card.code)).Completed += OnLoadIllusCompleted;
+
+
+            if (background)
+            {
+                var cardType = Network.Query.Config.GetType_ByCode(card.code);
+                var bgKey = (cardType) switch
+                {
+                    CardType.Monster => "card_background_normal_monster",
+                    CardType.Spell => "card_background_spell",
+                    _ => "card_background_normal_monster",
+                };
+
+                background.sprite = await Addressables.LoadAssetAsync<Sprite>(bgKey);
+            }
+
+
+            // if (illustration) illustration.sprite = await Addressables.LoadAssetAsync<Sprite>(FakeConfig.GetIllusKey(card.code));
+        }
+
+        private void OnLoadIllusCompleted(AsyncOperationHandle<Sprite> obj)
+        {
+            if (illustration) illustration.sprite = obj.Result;
+            // _isLoadingIllus = false;
         }
     }
 

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using event_name;
 using Gameplay;
 using Gameplay.board;
 using Gameplay.card.ui;
 using Networks;
 using Sirenix.OdinInspector;
+using TigerForge;
 using Random = UnityEngine.Random;
 
 [Serializable]
@@ -197,6 +199,47 @@ public class Zone_MainMonster
         for (int i = 0; i < spaces.Count; i++)
         {
             spaces[i].card = null;
+        }
+    }
+
+    public void Sync(int playerIndex, List<SyncTemp_TableCard> tempCards)
+    {
+        // foreach (var space in spaces)
+        // {
+        //     if(space.card != null && tempCards.All())
+        // }
+
+        for (int i = 0; i < spaces.Count(); i++)
+        {
+            if (spaces[i].card != null && tempCards.Any(tempCard => tempCard.id.ToString() == spaces[i].card.Guid))
+            {
+                var tempCard = tempCards.First(tempCard => tempCard.id.ToString() == spaces[i].card.Guid);
+
+                spaces[i].position = tempCard.position == "ATTACK" ? MonsterPosition.Attack : MonsterPosition.Defense;
+                spaces[i].face = tempCard.face;
+            }
+            
+            if (spaces[i].card != null && tempCards.All(tempCard => tempCard.id.ToString() != spaces[i].card.Guid))
+            {
+                spaces[i].card = null;
+            }
+        }
+
+        foreach (var tempCard in tempCards)
+        {
+            // if(tempCard.type != "MONSTER") continue;
+
+            if (spaces.All(space => space.card == null || space.card.Guid != tempCard.id.ToString()))
+            {
+                var addCard = tempCard.To_ServerCard();
+                var emptyIndex = FirstEmptyIndex();
+                
+                DueCardQuery.InitCard(addCard);
+                
+                spaces[emptyIndex].card = addCard;
+                spaces[emptyIndex].position = tempCard.position == "ATTACK" ? MonsterPosition.Attack : MonsterPosition.Defense;
+                spaces[emptyIndex].face = tempCard.face;
+            }
         }
     }
 }

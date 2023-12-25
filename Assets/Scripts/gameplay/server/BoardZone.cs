@@ -1,10 +1,11 @@
 using System;
 using Gameplay.card.ui;
+using Sirenix.OdinInspector;
 
 [Serializable]
 public class BoardZone
 {
-    public Zone_InHand inHand = new();
+    [ShowInInspector] public Zone_InHand inHand = new();
     public Zone_MainMonster mainMonster = new();
     public Zone_SpellTrap spellTrap = new();
     public Zone_Field field = new();
@@ -40,6 +41,14 @@ public class BoardZone
         {
             index = mainMonsterIndex,
             zoneType = BoardZoneType.MainMonster,
+        };
+        
+        
+        var fieldIndex = field.SearchIndex(cardGuid);
+        if(fieldIndex != CardLocation.NotFound) return new CardLocation()
+        {
+            index = fieldIndex,
+            zoneType = BoardZoneType.Field,
         };
 
         return new()

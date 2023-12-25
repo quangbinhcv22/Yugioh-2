@@ -4,6 +4,7 @@ using event_name;
 using Gameplay;
 using Gameplay.board;
 using gameplay.present;
+using gameplay.server;
 using Networks;
 using TigerForge;
 using UnityEngine;
@@ -119,10 +120,23 @@ public static class DueNotifier
 
         EventManager.EmitEventData(EventName.Gameplay.MonsterDie, data);
     }
+    
+    // public static void Notify_FieldCardDie(int playerIndex, string cardGuild)
+    // {
+    //     // var data = new Event_MonsterDie()
+    //     // {
+    //     //     playerIndex = playerIndex,
+    //     //     cardGuild = cardGuild,
+    //     //     reason = Event_MonsterDie.Reason.Attack
+    //     // };
+    //     //
+    //     // EventManager.EmitEventData(EventName.Gameplay.MonsterDie, data);
+    // }
+    
 
     public static void Notify_ToGraveyard(int playerIndex, string cardGuild)
     {
-        EventManager.EmitEvent(EventName.Gameplay.ToGraveyard);
+        EventManager.EmitEventData(EventName.Gameplay.ToGraveyard, cardGuild);
     }
 }
 

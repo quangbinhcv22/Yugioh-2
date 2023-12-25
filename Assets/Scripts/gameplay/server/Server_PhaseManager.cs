@@ -40,20 +40,7 @@ public class Server_PhaseManager : MonoBehaviour
 
 
     public bool InTurn;
-
-    public async void StartGame()
-    {
-        // TurnCount = 1;
-        //
-        // PhaseStart = DateTime.Now;
-        // PhaseEnd = PhaseStart + TimeSpan.FromSeconds(DueConstant.secondsPerTurn);
-        // InTurn = true;
-        //
-        // DueNotifier.Notify_ToTurn(TurnIndex);
-        //
-        // await UniTask.Delay(waitToNext);
-        // Switch_Main1();
-    }
+    
 
     private void Update()
     {

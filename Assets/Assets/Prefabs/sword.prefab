@@ -90,7 +90,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   image: {fileID: 6259587928328396091}
-  rotateDuration: 0.3
+  rotateDuration: 0.5
   rotateEase: 6
-  toDuration: 0.25
-  toEase: 6
+  toDuration: 0.7
+  delay: 0.03
+  toEase: 17

@@ -26,6 +26,9 @@ public class PresentHandler_SummonMonster : Singleton<PresentHandler_SummonMonst
         Notifier_DueData.Current.event_summonMonster -= HandleData;
     }
 
+
+    
+
     private async void HandleData(Event_SummonMonster data)
     {
         if ((Team)data.playerIndex is Team.Self)
@@ -35,7 +38,7 @@ public class PresentHandler_SummonMonster : Singleton<PresentHandler_SummonMonst
 
         if (data.position is MonsterPosition.Attack)
         {
-            CardAction_PhaseMain.Current.wasAttacker.Add(data.summonGuid);
+            CardAction_PhaseMain.Current.Notify_WasAttacker(data.summonGuid);
         }
 
         var isTribute = data.tributeGuids != null && data.tributeGuids.Any();
@@ -62,6 +65,11 @@ public class PresentHandler_SummonMonster : Singleton<PresentHandler_SummonMonst
 
         EventManager.EmitEvent(EventName.Gameplay.UI_RefreshPhase);
         OnSummon?.Invoke();
+    }
+
+    private void Sync()
+    {
+        
     }
 }
 

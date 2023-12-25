@@ -1,3 +1,5 @@
+using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using event_name;
 using Sirenix.OdinInspector;
@@ -13,9 +15,10 @@ namespace UX
         [SerializeField] private float rotateDuration = 0.15f;
         [SerializeField] private Ease rotateEase = Ease.OutQuad;
         [SerializeField] private float toDuration = 1f;
+        [SerializeField] private float delay = 0.25f;
         [SerializeField] private Ease toEase = Ease.OutQuad;
-
-
+        
+        
         public void Highlight(bool highlight)
         {
             image.color = highlight ? Color.white : new Color(1, 1, 1, 0.5f);
@@ -27,15 +30,21 @@ namespace UX
             gameObject.SetActive(true);
 
             transform.position = from;
-            transform.eulerAngles = Vector3.zero;
+            transform.eulerAngles = from.y < to.y ? Vector3.zero : new Vector3(0,0,180);
 
 
             transform.DORotate(AnglesTo(to), rotateDuration).SetEase(rotateEase);
-            
+
             var tween = transform.DOMove(to, toDuration).SetEase(toEase);
-            tween.onComplete += () => { gameObject.SetActive(false); };
+            tween.onComplete += OnFlyDone;
 
             return tween;
+        }
+
+        private async void OnFlyDone()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(delay));
+            gameObject.SetActive(false);
         }
 
 

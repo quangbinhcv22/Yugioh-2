@@ -777,6 +777,34 @@ MonoBehaviour:
     m_Address: popup_error_notify
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 6218a8dbc6b235e40a9b0d263b1a2b75
+    m_Address: 35956022
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: f7dc79d6a5e19a5439b52c74e98bef30
+    m_Address: 87430998
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 01d412c510bd6a747be10598c5916e8e
+    m_Address: 59197169
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1579bcfe9d209a74ca795607e03e19f5
+    m_Address: 81380218
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5826102cab0c37342b8ae57e1a3f7958
+    m_Address: 56594520
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 3591efee6e67fc647a01624b88bada95
+    m_Address: card_background_normal_monster
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b1b3c2e727cd9d14c9f83317ed994fef
+    m_Address: card_background_spell
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 642e18697cb42f34cb576bdb0f8b5a30, type: 2}
   m_SchemaSet:

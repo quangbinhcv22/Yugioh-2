@@ -4,13 +4,16 @@ using System.Linq;
 using AI;
 using battle.define;
 using Cysharp.Threading.Tasks;
-using Gameplay;
 using Gameplay.board;
+using Gameplay.card;
+using gameplay.manager;
 using Gameplay.player;
 using gameplay.present;
+using gameplay.server;
 using Networks;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Network = Networks.Network;
 
 [DefaultExecutionOrder(int.MinValue)]
@@ -25,7 +28,16 @@ public class Server_DueManager : MonoBehaviour
         main = this;
 
         await UniTask.Delay(50);
-        StartGame();
+
+        
+        if (DueManager.isReloadingBattle)
+        {
+            ReloadingBattle();
+        }
+        else
+        {
+            StartGame();
+        }
     }
 
     public async void OnNewRound(int loser)
@@ -37,8 +49,8 @@ public class Server_DueManager : MonoBehaviour
     }
 
 
-    public Player player1;
-    public Player player2;
+    [FormerlySerializedAs("player1")] public Player self;
+    [FormerlySerializedAs("player2")] public Player opponent;
 
 
     public int RequiredRounds = 3;
@@ -48,30 +60,62 @@ public class Server_DueManager : MonoBehaviour
     [ShowInInspector, HideInEditorMode] public int CurrentRound { get; set; }
 
 
+    public Player GetPlayer(string id)
+    {
+        return Networks.Network.Query.IsSelf(id) ? self : opponent;
+    }
+
+
     public Player GetPlayer(int index)
     {
-        return index == 0 ? player1 : player2;
+        return index == 0 ? self : opponent;
     }
 
     public Player GetPlayer(Team team)
     {
-        return team == Team.Self ? player1 : player2;
+        return team == Team.Self ? self : opponent;
     }
 
     public int GetPlayerIndex(Player player)
     {
-        return player == player1 ? 0 : 1;
+        return player == self ? 0 : 1;
     }
 
 
     public Player GetOtherPlayer(int index)
     {
-        return index == 1 ? player1 : player2;
+        return index == 1 ? self : opponent;
     }
 
     public int GetOtherPlayerIndex(int index)
     {
         return index == 0 ? 1 : 0;
+    }
+
+
+    public async void ReloadingBattle()
+    {
+        while (self == opponent)
+        {
+            self = FakeData.RandomPlayer();
+            opponent = FakeData.RandomPlayer();
+        }
+
+        DueManager.StartSync_ByReloading();
+
+        // Server_PhaseManager.main.TurnIndex = (int)Network.Cached.matching_myTurn - 1; //Random.Range(0, 2);
+        // State_Stats.StartGame();
+
+        // OnNextRound();
+
+        // DueNotifier.Data_UpdateRound(new Event_UpdateRound
+        // {
+        //     reason = Event_UpdateRound.Reason.StartGame,
+        // });
+        //
+        await UniTask.Delay(Server_PhaseManager.main.waitToNext * 2);
+        
+        DueNotifier.Notify_StartGame();
     }
 
 
@@ -81,16 +125,16 @@ public class Server_DueManager : MonoBehaviour
         CurrentRound = 1;
         IsEndGame = false;
 
-        while (player1 == player2)
+        while (self == opponent)
         {
-            player1 = FakeData.RandomPlayer();
-            player2 = FakeData.RandomPlayer();
+            self = FakeData.RandomPlayer();
+            opponent = FakeData.RandomPlayer();
         }
 
 
-        // FakeConfig.NewMonster();
-
         Server_PhaseManager.main.TurnIndex = (int)Network.Cached.matching_myTurn - 1; //Random.Range(0, 2);
+        State_Stats.StartGame();
+
         OnNextRound();
 
 
@@ -100,42 +144,21 @@ public class Server_DueManager : MonoBehaviour
         });
 
         await UniTask.Delay(Server_PhaseManager.main.waitToNext * 2);
-        Server_PhaseManager.main.StartGame();
-
         DueNotifier.Notify_StartGame();
     }
 
 
     private void OnNextRound()
     {
-        player1.hp = DueConstant.hp;
-        player2.hp = DueConstant.hp;
+        DueManager.Reset_Hp();
 
-        player1.zone.ClearAll();
-        player2.zone.ClearAll();
+        self.zone.ClearAll();
+        opponent.zone.ClearAll();
 
-        player1.normalSummonThisTurn = false;
-        player2.normalSummonThisTurn = false;
-
-
-        // player1.zone.mainDeck.Import(Network.Cached.Fighting.startGame.cardCodes);
-        // player2.zone.mainDeck.Import(Network.Cached.Fighting.startGame.cardCodes);
-        //
+        self.normalSummonThisTurn = false;
+        opponent.normalSummonThisTurn = false;
 
         main.DrawDefault(Server_PhaseManager.main.TurnIndex);
-
-
-        Notifier_DueData.Current.Changed_lifePoint(new Event_Changed_LifePoint()
-        {
-            playerIndex = 0,
-            reason = Event_Changed_LifePoint.Reason.StartGame,
-        });
-
-        Notifier_DueData.Current.Changed_lifePoint(new Event_Changed_LifePoint()
-        {
-            playerIndex = 1,
-            reason = Event_Changed_LifePoint.Reason.StartGame,
-        });
     }
 
 
@@ -206,11 +229,11 @@ public class Server_DueManager : MonoBehaviour
         // Draw(firstPlayerIndex, StartCardsInHand);
         // Draw(GetOtherPlayerIndex(firstPlayerIndex), StartCardsInHand);
 
-        Server_DueManager.main.player1.zone.mainDeck.Init();
-        Server_DueManager.main.player2.zone.mainDeck.Init();
-        
+        Server_DueManager.main.self.zone.mainDeck.Init();
+        Server_DueManager.main.opponent.zone.mainDeck.Init();
+
         Draw(0, Network.Cached.Fighting.startGame.cards);
-        Draw(1,  ServerCard.New5Anonymous());
+        Draw(1, ServerCard.New5Anonymous());
 
 
         DueNotifier.Notify_DrawDefault();
@@ -232,7 +255,7 @@ public class Server_DueManager : MonoBehaviour
         {
             DueCardQuery.InitCard(card);
             inHand.Add(card);
-            
+
             DueNotifier.Notify_InHandAdd(playerIndex, card.Guid);
         }
 
@@ -285,84 +308,6 @@ public class Server_DueManager : MonoBehaviour
         });
     }
 
-
-    public void InHand_Use(int playerIndex, string cardGuid, InHand_CardUse cardUse)
-    {
-        var player = GetPlayer(playerIndex);
-
-        throw new NotImplementedException();
-        // var card = player.zone.inHand.Take(cardGuid);
-        var cardType = FakeConfig.GetType_ByGuid(cardGuid);
-
-        // kiểm tra đã triệu hồi thường lượt này chưa
-        // kiểm tra tính hợp lý triệu hồi
-
-        if (cardType is CardType.Monster)
-        {
-            // hiến tế nếu có
-
-            if (cardUse is InHand_CardUse.Summon)
-            {
-                return;
-
-                throw new NotImplementedException();
-                // player.normalSummonThisTurn = true; var index = player.zone.mainMonster.Summon_Attack(card);
-
-                // DueNotifier.Notify_InHandRemove(playerIndex, cardGuid);
-                //
-                // Notifier_DueData.Current.Event_SummonMonster(new()
-                // {
-                //     playerIndex = playerIndex,
-                //     summonGuid = cardGuid,
-                //     position = MonsterPosition.Attack,
-                //     summonIndex = index,
-                // });
-            }
-            else if (cardUse is InHand_CardUse.Set)
-            {
-                player.normalSummonThisTurn = true;
-
-                throw new NotImplementedException();
-                // var index = player.zone.mainMonster.Summon_Defense(card);
-
-                // DueNotifier.Notify_InHandRemove(playerIndex, cardGuid);
-                // Notifier_DueData.Current.Event_SummonMonster(new()
-                // {
-                //     playerIndex = playerIndex,
-                //     summonGuid = cardGuid,
-                //     position = MonsterPosition.Defense,
-                //     summonIndex = index,
-                // });
-            }
-        }
-        else if (cardType is CardType.Spell) //or CardType.Trap)
-        {
-            throw new NotImplementedException();
-
-            // var index = player.zone.spellTrap.Set(card);
-            // var team = playerIndex == 0 ? Team.Self : Team.Opponent;
-            //
-            // DueNotifier.Notify_InHandRemove(playerIndex, cardGuid);
-            //
-            // Notifier_DueData.Current.Event_SetSpell(new()
-            // {
-            //     team = playerIndex == 0 ? Team.Self : Team.Opponent,
-            //     guid = cardGuid,
-            //     index = index,
-            // });
-            //
-            // var spell = SpellCard_Query.InstantiateSpell(team, cardGuid);
-            // spell.OnActive();
-        }
-        else if (cardType is CardType.Field)
-        {
-            // xử lý sau
-        }
-
-        // Thông báo
-    }
-
-
     public void Attack(int atkPlayerIndex, string attackerGuild, string defenderGuild)
     {
         var atkPlayer = GetPlayer(atkPlayerIndex);
@@ -374,158 +319,46 @@ public class Server_DueManager : MonoBehaviour
 
         if (directAttack)
         {
-            Network.Request.Fighting.AttackTableCardDirect(new ()
+            Network.Request.Fighting.AttackTableCardDirect(new()
             {
                 sourceCardId = long.Parse(atkMonster.card.Guid),
             });
 
             return;
 
-            var damage = atkMonster.attack;
-            ModifyHp_ByAttack(defPlayerIndex, -damage);
-
-            Notifier_DueData.Current.Event_Attack(new Event_Attack()
-            {
-                playerAttackIndex = atkPlayerIndex,
-                attackerGuid = attackerGuild,
-                defenderGuid = defenderGuild,
-                damagedPlayerIndex = defPlayerIndex,
-                damage = damage,
-            });
+            // var damage = atkMonster.attack;
+            // ModifyHp_ByAttack(defPlayerIndex, -damage);
+            //
+            // Notifier_DueData.Current.Event_Attack(new Event_Attack()
+            // {
+            //     playerAttackIndex = atkPlayerIndex,
+            //     attackerGuid = attackerGuild,
+            //     defenderGuid = defenderGuild,
+            //     damagedPlayerIndex = defPlayerIndex,
+            //     damage = damage,
+            // });
         }
         else
         {
             var defMonster = defPlayer.zone.mainMonster.Get(defenderGuild);
-            
+
             Network.Request.Fighting.AttackTableCard(new Request_AttackTableCard()
             {
                 sourceCardId = long.Parse(atkMonster.card.Guid),
                 targetCardId = long.Parse(defMonster.card.Guid),
             });
-            
+
             return;
-
-            // quái bị tấn công trong trạng thái công
-            if (defMonster.position is MonsterPosition.Attack)
-            {
-                var difference = atkMonster.attack - defMonster.attack;
-
-                // cả 2 quái đều chết, không ai bị thiệt hại
-                if (difference == 0)
-                {
-                    MonsterDie(atkPlayerIndex, attackerGuild);
-                    MonsterDie(defPlayerIndex, defenderGuild);
-
-                    Notifier_DueData.Current.Event_Attack(new Event_Attack()
-                    {
-                        playerAttackIndex = atkPlayerIndex,
-                        attackerGuid = attackerGuild,
-                        defenderGuid = defenderGuild,
-                        damagedPlayerIndex = defPlayerIndex,
-                        damage = difference,
-                        dieCards = new() { attackerGuild, defenderGuild }
-                    });
-                }
-                // quái tấn công sát thương lớn hơn, quái thủ chết, người thủ bị thiệt hại
-                else if (difference > 0)
-                {
-                    MonsterDie(defPlayerIndex, defenderGuild);
-                    ModifyHp_ByAttack(defPlayerIndex, -Mathf.Abs(difference));
-
-
-                    Notifier_DueData.Current.Event_Attack(new Event_Attack()
-                    {
-                        playerAttackIndex = atkPlayerIndex,
-                        attackerGuid = attackerGuild,
-                        defenderGuid = defenderGuild,
-                        damagedPlayerIndex = defPlayerIndex,
-                        damage = difference,
-                        dieCards = new() { defenderGuild }
-                    });
-                }
-                // quái tấn công sát thương nhỏ hơn, quái công chết, người công bị thiệt hại
-                else
-                {
-                    MonsterDie(atkPlayerIndex, attackerGuild);
-                    ModifyHp_ByAttack(atkPlayerIndex, -Mathf.Abs(difference));
-
-
-                    Notifier_DueData.Current.Event_Attack(new Event_Attack()
-                    {
-                        playerAttackIndex = atkPlayerIndex,
-                        attackerGuid = attackerGuild,
-                        defenderGuid = defenderGuild,
-                        damagedPlayerIndex = atkPlayerIndex,
-                        damage = difference,
-                        dieCards = new() { attackerGuild }
-                    });
-                }
-            }
-            // quái bị tấn công trong trạng thái thủ
-            else
-            {
-                //lật bài nếu có
-                var difference = atkMonster.attack - defMonster.defense;
-
-                // đánh làm màu
-                if (difference == 0)
-                {
-                    Notifier_DueData.Current.Event_Attack(new Event_Attack()
-                    {
-                        playerAttackIndex = atkPlayerIndex,
-                        attackerGuid = attackerGuild,
-                        defenderGuid = defenderGuild,
-                        damagedPlayerIndex = defPlayerIndex,
-                        damage = 0,
-                    });
-                }
-                // quái thủ chết
-                else if (difference > 0)
-                {
-                    MonsterDie(defPlayerIndex, defenderGuild);
-
-                    Notifier_DueData.Current.Event_Attack(new Event_Attack()
-                    {
-                        playerAttackIndex = atkPlayerIndex,
-                        attackerGuid = attackerGuild,
-                        defenderGuid = defenderGuild,
-                        damagedPlayerIndex = defPlayerIndex,
-                        damage = 0,
-                        dieCards = new() { defenderGuild }
-                    });
-                }
-                // người công chịu thiệt hại
-                else
-                {
-                    ModifyHp_ByAttack(atkPlayerIndex, -Mathf.Abs(difference));
-
-                    Notifier_DueData.Current.Event_Attack(new Event_Attack()
-                    {
-                        playerAttackIndex = atkPlayerIndex,
-                        attackerGuid = attackerGuild,
-                        defenderGuid = defenderGuild,
-                        damagedPlayerIndex = atkPlayerIndex,
-                        damage = difference,
-                    });
-                }
-            }
         }
     }
 
 
-    public void DealDamage(Team team, int damage, string sourceGuid)
-    {
-        var player = GetPlayer(team);
-        player.hp -= damage;
-        player.hp = Mathf.Max(player.hp, 0);
-
-        CheckHp(player);
-    }
-
-
     [Obsolete]
-    public void MonsterDie(int playerIndex, string guild)
+    public void MonsterDie(string guild)
     {
+        var location = DueCardQuery.Locate(guild);
+        var playerIndex = location.playerIndex;
+
         var player = GetPlayer(playerIndex);
         var dieCard = player.zone.mainMonster.Die(guild);
         player.zone.graveyard.Add(dieCard);
@@ -533,6 +366,21 @@ public class Server_DueManager : MonoBehaviour
         DueNotifier.Notify_MonsterDie(playerIndex, guild);
         DueNotifier.Notify_ToGraveyard(playerIndex, guild);
     }
+
+    [Obsolete]
+    public void FieldCardDie(string guild)
+    {
+        var location = DueCardQuery.Locate(guild);
+        var playerIndex = location.playerIndex;
+
+        var player = GetPlayer(playerIndex);
+        var dieCard = player.zone.field.SendOldToGraveyard();
+        player.zone.graveyard.Add(dieCard);
+
+        // DueNotifier.Notify_MonsterDie(playerIndex, guild);
+        DueNotifier.Notify_ToGraveyard(playerIndex, guild);
+    }
+
 
     [Obsolete]
     public void ModifyHp_ByAttack(int playerIndex, int amount)
@@ -550,19 +398,6 @@ public class Server_DueManager : MonoBehaviour
         CheckHp(player);
     }
 
-    public void SendToGraveyard(string guid)
-    {
-        // var location = DueCardQuery.Locate(guid);
-        //
-        // var player = GetPlayer(location.OfTeam);
-        //
-        // var dieCard = player.zone.spellTrap.Take(guild);
-        // player.zone.graveyard.Add(dieCard);
-        //
-        // DueNotifier.Notify_MonsterDie(playerIndex, guild);
-    }
-
-
     private void CheckHp(Player player)
     {
         if (player.hp <= 0)
@@ -576,13 +411,13 @@ public class Server_DueManager : MonoBehaviour
         Debug.Log("Changed position");
 
         var player = GetPlayer(playerIndex);
-        var newPosition = player.zone.mainMonster.ChangePosition(cardGuid);
+        var newPosition = player.zone.mainMonster.FindFromID(cardGuid).position.ChangeCase();
 
-        Notifier_DueData.Current.Event_ChangePosition(new()
+
+        Network.Request.Fighting.ChangeTableCardPosition(new()
         {
-            playerIndex = playerIndex,
-            guid = cardGuid,
-            position = newPosition,
+            cardId = long.Parse(cardGuid),
+            position = newPosition.ServerKey(),
         });
     }
 }

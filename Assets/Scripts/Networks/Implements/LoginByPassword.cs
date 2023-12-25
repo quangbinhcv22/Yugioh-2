@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json.Linq;
 using QBPlugins.ScreenFlow;
+using UnityEngine;
 
 namespace Networks
 {
@@ -37,12 +38,17 @@ namespace Networks
                     ruby = data.ruby;
                 }
             }
+
+
+            public static Request_LoginByPassword cachedLoginRequest;
+            public static Request_LoginByPassword _tempCachedLoginRequest;
         }
 
         public static partial class Request
         {
             public static void LoginByPassword(Request_LoginByPassword data)
             {
+                Cached.cachedLoginRequest = data;
                 Send(MessageID.LOGIN_BY_PASSWORD, data);
             }
         }
@@ -51,15 +57,40 @@ namespace Networks
         {
             public static void LoginByPassword(JObject data, string error)
             {
+                var haveError = !string.IsNullOrEmpty(error);
+
+                if (NetworkConnection.IsReconnecting && haveError)
+                {
+                    NetworkConnection.Reconnect();
+                    return;
+                }
+
                 if (string.IsNullOrEmpty(error))
                 {
                     var response = data.ToObject<Response_LoginByPassword>();
+
+                    // Cached.cachedLoginRequest = Cached._tempCachedLoginRequest;
+
+
                     Cached.playerInfo = new Cached.PlayerInfo_Server(response);
 
-                    Request.GetMyDecks();
-                    Request.Config.GetCardDataVersion();
+                    if (NetworkConnection.IsReconnecting)
+                    {
+                        NetworkConnection.IsReconnecting = false;
+                        Screen_Reconnecting.singleton.Close();
+                    }
+                    else
+                    {
+                        Request.GetMyDecks();
+                        Request.Config.GetCardDataVersion();
+                    }
 
-                    ScreenManager.Open(ScreenKey.Loading);
+                    if (ScreenManager.CurrentWindow.name.Contains(ScreenKey.Login))
+                    {
+                        ScreenManager.Open(ScreenKey.Loading);
+                    }
+
+                    Request.ReconnectGameSession();
                 }
                 else
                 {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using battle.define;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -15,8 +16,6 @@ namespace Networks
             {
                 public static void GetCardDataVersion()
                 {
-                    PlayerPrefs.DeleteAll();
-                    
                     Send(MessageID.GET_CARD_DATA_VERSION);
                 }
 
@@ -66,22 +65,33 @@ namespace Networks
     //     
     // }
 
-    public struct Response_GetCardData
-    {
-    }
 
     [Serializable]
-    public class CardConfig
+    public struct CardConfig
     {
         public string code;
-        public int def;
-        public int level;
-        public string monsterType;
         public string name;
-        public int atk;
         public string type;
-        public string monsterAttribute;
         public string desc;
         public int rarity;
+
+        public string monsterType;
+        public string monsterAttribute;
+        public int level;
+        public int atk;
+        public int def;
+
+        public string spellType;
+        public List<Effect> effects;
+    }
+    
+    [Serializable]
+    public struct Effect
+    {
+        public string targetCardType;
+        public string type;
+        public string targetCardPosition;
+        public int value;
+        public List<string> targetMonsterTypes;
     }
 }

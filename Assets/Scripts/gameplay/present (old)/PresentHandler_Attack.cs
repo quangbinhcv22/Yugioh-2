@@ -6,6 +6,7 @@ using Cysharp.Threading.Tasks;
 using Gameplay.board;
 using UnityEngine;
 using UX;
+using Network = Networks.Network;
 
 namespace gameplay.present
 {
@@ -38,7 +39,7 @@ namespace gameplay.present
         {
             IsPresenting = true;
 
-            if (Networks.Network.Query.Fighting.IsOwnTurn)
+            if (Network.Query.Fighting.IsOwnTurn)
             {
                 CardAction_PhaseBattle.Current.attackedGuids.Add(@event.attackerGuid);
             }
@@ -78,7 +79,7 @@ namespace gameplay.present
                 });
 
 
-                var dieGuids = @event.dieCards;
+                var dieGuids = Network.Cached.Fighting.dieCards;
                 if (dieGuids != null && dieGuids.Any())
                 {
                     foreach (var dieGuid in dieGuids)
@@ -87,6 +88,8 @@ namespace gameplay.present
                         spaceSlot.Die();
                     }
                 }
+                
+                Network.Cached.Fighting.ResolveDieCard();
 
                 IsPresenting = false;
                 presentCompleted?.Invoke();
@@ -115,7 +118,7 @@ namespace gameplay.present
         public int damagedPlayerIndex;
         public int damage;
 
-        public List<string> dieCards;
+        // public List<string> dieCards;
 
         public bool IsAttackDirect => string.IsNullOrEmpty(defenderGuid);
     }

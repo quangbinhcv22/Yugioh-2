@@ -10,12 +10,12 @@ namespace QBPlugins.Game.Core
         
         public override void OnActive()
         {
-            State_Stats.Add(team, buff);
+            // State_Stats.Add(team, buff);
         }
 
         public override void OnDeactivate()
         {
-            State_Stats.Remove(team, buff);
+            // State_Stats.Remove(team, buff);
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using battle.define;
 using Cysharp.Threading.Tasks;
+using gameplay.manager;
 using Newtonsoft.Json.Linq;
 using QBPlugins.ScreenFlow;
 using Random = UnityEngine.Random;
@@ -72,6 +73,7 @@ namespace Networks
 
                 Cached.Fighting.startGame = response;
                 Cached.Fighting.turnCount = -1;
+                Cached.Fighting.revealedCards.Clear();
 
                 await UniTask.Delay(1750);
                 ScreenManager.Open(ScreenKey.LoadingToBattle);
@@ -81,25 +83,23 @@ namespace Networks
             {
                 var response = data.ToObject<Response_StartRound>();
                 Cached.Fighting.endRoundTime = DateTime.Now + TimeSpan.FromMilliseconds(response.timeout);
-
-
+                
+                
                 await UniTask.WaitUntil(() => Server_DueManager.main);
 
                 Cached.Fighting.round = response;
                 Cached.Fighting.turnCount++;
 
-                Event.Fighting.startRound?.Invoke(response);
+                
+                DueManager.OnStartRound();
 
-                DueNotifier.Notify_ToTurn(Query.IsSelf(response.player) ? 0 : 1);
-                Server_DueManager.main.player1.normalSummonThisTurn = false;
+                Server_DueManager.main.self.normalSummonThisTurn = false;
             }
 
             public static void OnPhase(JObject data)
             {
                 var response = data.ToObject<Response_OnPhase>();
-                Cached.Fighting.phase = response;
-
-                Event.Fighting.onPhase?.Invoke(response);
+                DueManager.OnStartPhase(response);
             }
         }
     }
@@ -132,10 +132,10 @@ namespace Networks
             {
                 id = Random.Range(int.MinValue, -1),
             };
-            
+
             return result;
         }
-        
+
         public static List<ServerCard> New5Anonymous()
         {
             var cards = new List<ServerCard>();
@@ -143,7 +143,7 @@ namespace Networks
             {
                 cards.Add(NewAnonymous());
             }
-            
+
             return cards;
         }
 
@@ -152,6 +152,7 @@ namespace Networks
 
         public int atk;
         public int def;
+        public string position;
 
         public string Guid
         {

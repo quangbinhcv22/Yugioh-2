@@ -22,12 +22,18 @@ namespace Networks
                 return playerID.ToString() == selfID;
             }
 
+            public static Team ToTeam(object playerID)
+            {
+                var selfID = Cached.playerInfo.id.ToString();
+                return playerID.ToString() == selfID ? Team.Self : Team.Opponent;
+            }
+
 
             public static class Config
             {
                 private static Dictionary<string, CardConfig> _cards;
 
-                public static CardConfig GetCard(string code)
+                private static void LoadCards()
                 {
                     if (_cards == null)
                     {
@@ -37,18 +43,46 @@ namespace Networks
                         var cards = JsonConvert.DeserializeObject<List<CardConfig>>(json);
                         _cards = cards.ToDictionary(c => c.code, c => c);
                     }
+                }
 
-                    if (_cards == null)
-                    {
-                        Debug.LogError("CARD NULL");
-                    }
-                    
+                public static CardConfig GetCard(string code)
+                {
+                    LoadCards();
+
+                    if (DueCardQuery.IsAnonymousCard(code)) return new();
+
                     if (!_cards.ContainsKey(code))
                     {
-                        Debug.Log(code);
+                        return new();
                     }
 
                     return _cards[code];
+                }
+
+                public static bool IsValidCode(string code)
+                {
+                    LoadCards();
+                    return _cards.ContainsKey(code);
+                }
+
+                public static List<CardConfig> Get_CardByType(CardType type)
+                {
+                    LoadCards();
+                    return _cards.Values.Where(c => c.type == type.ToString().ToUpper()).ToList();
+                }
+
+
+                public static CardType GetType_ByCode(string code)
+                {
+                    switch (GetCard(code).type)
+                    {
+                        case "MONSTER":
+                            return CardType.Monster;
+                        case "SPELL":
+                            return CardType.Spell;
+                        default:
+                            throw new KeyNotFoundException();
+                    }
                 }
             }
 
@@ -89,6 +123,13 @@ namespace Networks
                 {
                     return team == Team.Self ? Cached.matching_self : Cached.matching_opponent;
                 }
+
+
+                public static bool IsRevealedCard(string cardGuid)
+                {
+                    return Cached.Fighting.revealedCards.Contains(cardGuid);
+                }
+
             }
         }
     }

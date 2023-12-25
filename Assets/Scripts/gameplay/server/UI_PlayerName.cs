@@ -1,3 +1,4 @@
+using System;
 using battle.define;
 using event_name;
 using TigerForge;
@@ -9,7 +10,7 @@ public class UI_PlayerName : MonoBehaviour
 {
     [SerializeField] private Team team;
     [SerializeField] private TMP_Text amount;
-    
+
     private void OnEnable()
     {
         EventManager.StartListening(EventName.Gameplay.StartGame, UpdateView);
@@ -24,8 +25,15 @@ public class UI_PlayerName : MonoBehaviour
     private void UpdateView()
     {
         var info = Network.Query.Fighting.GetTeam(team);
-        
-        var value = info.displayName;
-        amount.SetText($"{value}");
+
+        try
+        {
+            var value = info.displayName;
+            amount.SetText($"{value}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e);
+        }
     }
 }

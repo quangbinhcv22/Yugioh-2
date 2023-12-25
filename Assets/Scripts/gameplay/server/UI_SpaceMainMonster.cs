@@ -1,11 +1,12 @@
-using System;
 using System.Collections.Generic;
 using battle.define;
-using Cysharp.Threading.Tasks;
 using Gameplay.board;
 using Gameplay.card.ui;
+using gameplay.manager;
+using Networks;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UX;
 
 
 public class UI_SpaceMainMonster : MonoBehaviour
@@ -34,12 +35,16 @@ public class UI_SpaceMainMonster : MonoBehaviour
     private void OnEnable()
     {
         PresentHandler_Zone_MainMonster.onClear += OnClear;
+        
+        DueManager.onSync_TableCard += OnSyncInHand;
     }
+
 
     private void OnDisable()
     {
         PresentHandler_Zone_MainMonster.onClear -= OnClear;
-        
+        DueManager.onSync_TableCard -= OnSyncInHand;
+
         _spaces.Remove((team, uiIndex));
 
     }
@@ -50,6 +55,80 @@ public class UI_SpaceMainMonster : MonoBehaviour
         Die();
     }
 
+    
+    
+    private void OnSyncInHand()
+    {
+        var data = DueManager.GetMonsterSpace(team, uiIndex);
+        
+        // Debug.Log("Sync Table");
+        
+        Die();
+        
+        if (data.card == null)
+        {
+            
+        }
+        else
+        {
+            // OnSummon(data.card.Guid);
+
+            SyncCard();
+            SyncPosition();
+            SyncFace();
+        }
+    }
+    
+    
+
+    public void SyncCard()
+    {
+        var info = DueManager.GetMonsterSpace(team, uiIndex);
+        MonsterPosition = info.position;
+
+        uiCard.gameObject.SetActive(true);
+        stats.SetGuid(info.card.Guid);
+        
+        DueCardQuery.SetUICard_CombatSpace(info.card.Guid, this);
+        
+        uiCard.Binding(info.card.Guid);
+    }
+
+    public void SyncFace()
+    {
+        var info = DueManager.GetMonsterSpace(team, uiIndex);
+        
+        stats.SetGuid(info.card.Guid);
+
+        if (info.face is "UP")
+        {
+            stats.Show();
+            uiCard.ShowBack();
+        }
+        else
+        {
+            stats.Hide();
+            uiCard.ShowHide();
+        }
+    }
+
+    public void SyncPosition()
+    {
+        var info = DueManager.GetMonsterSpace(team, uiIndex);
+        MonsterPosition = info.position;
+
+        var flipper = uiCard.GetComponent<FlipCard>();
+        if (info.position is MonsterPosition.Defense)
+        {
+            flipper.SetHorizontal();
+        }
+        else
+        {
+            flipper.SetVertical();
+        }
+    }
+    
+    
 
     public void OnSummon(string cardGuild)
     {
@@ -81,7 +160,7 @@ public class UI_SpaceMainMonster : MonoBehaviour
     {
         MonsterPosition = position;
 
-        bool _wasAttacker = CardAction_PhaseMain.Current.wasAttacker.Contains(uiCard.Guid);
+        bool _wasAttacker = CardAction_PhaseMain.Current.wasAttacker.Contains(uiCard.Guid) || position is MonsterPosition.Attack;
 
         uiCard.Flip(MonsterPosition is MonsterPosition.Attack, _wasAttacker);
         stats.SetGuid(uiCard.Guid);
@@ -112,6 +191,14 @@ public class UI_SpaceMainMonster : MonoBehaviour
         stats.Hide();
     }
 
+    
+    public void OnRevealedCard(Event_RevealedCard @change)
+    {
+        uiCard.ShowBack();
+        uiCard.OnRevealed(change.cardCode);
+        stats.Show();
+    }
+    
     public void OnTribute()
     {
         uiCard.UnBinding();

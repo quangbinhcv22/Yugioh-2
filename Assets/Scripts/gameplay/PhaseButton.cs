@@ -1,6 +1,7 @@
 using System;
 using battle.define;
 using event_name;
+using gameplay.manager;
 using Networks;
 using TigerForge;
 using TMPro;
@@ -28,9 +29,10 @@ namespace Gameplay
             // AsButton(false);
             Highlight(false);
 
-            EventManager.StartListening(EventName.Gameplay.ToTurn, OnToTurn);
+            EventManager.StartListening(EventName.Gameplay.ToTurn, RefreshColor);
 
             Networks.Network.Event.Fighting.onPhase += OnPhase;
+            DueManager.onSync_Phase += RefreshStatus;
 
             EventManager.StartListening(EventName.Gameplay.UI_RefreshPhase, RefreshStatus);
 
@@ -43,8 +45,9 @@ namespace Gameplay
 
         private void OnDisable()
         {
-            EventManager.StopListening(EventName.Gameplay.ToTurn, OnToTurn);
+            EventManager.StopListening(EventName.Gameplay.ToTurn, RefreshColor);
             Networks.Network.Event.Fighting.onPhase -= OnPhase;
+            DueManager.onSync_Phase -= RefreshStatus;
             EventManager.StopListening(EventName.Gameplay.UI_RefreshPhase, RefreshStatus);
 
 
@@ -59,7 +62,7 @@ namespace Gameplay
         }
 
 
-        private void OnToTurn()
+        private void RefreshColor()
         {
             // var @event = EventManager.GetData(EventName.Gameplay.ToTurn) as Event_ToTurn;
 
@@ -89,6 +92,8 @@ namespace Gameplay
                     interactable = false;
                     break;
             }
+            
+            RefreshColor();
 
             Highlight(status is PhaseStatus.Highlight);
             AsButton(asButton);

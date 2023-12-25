@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Gameplay.card.ui;
+using Networks;
 using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class Old_Panel_CardOptions : Singleton<Old_Panel_CardOptions>
     public Button buttonSet;
     public Button buttonChangePosition;
     public TMP_Text notifyText;
-    
+
     public Button buttonSpellSet;
 
 
@@ -39,6 +39,7 @@ public class Old_Panel_CardOptions : Singleton<Old_Panel_CardOptions>
         buttonSummon.gameObject.SetActive(false);
         buttonSet.gameObject.SetActive(false);
         buttonChangePosition.gameObject.SetActive(false);
+        buttonSpellSet.gameObject.SetActive(false);
 
         var uiSlot = DueCardQuery.GetUICard(cardGuid);
         transform.position = uiSlot.transform.position + offset;
@@ -69,14 +70,14 @@ public class Old_Panel_CardOptions : Singleton<Old_Panel_CardOptions>
 
         return this;
     }
-    
+
     public Old_Panel_CardOptions UseAction_SpellInHand()
     {
         buttonSpellSet.gameObject.SetActive(true);
 
         return this;
     }
-    
+
 
     public Old_Panel_CardOptions UseAction_MonsterInBoard()
     {
@@ -128,11 +129,15 @@ public class Old_Panel_CardOptions : Singleton<Old_Panel_CardOptions>
         var myIndex = Client_DueManager.myIndex;
         var cardGuild = _cardGuid;
 
-        Server_DueManager.main.InHand_Use(myIndex, cardGuild, InHand_CardUse.Set);
+        Networks.Network.Request.Fighting.ReleaseHandCard(new Request_ReleaseHandCard_Spell()
+        {
+            cardId = long.Parse(cardGuild),
+            mode = ReleaseHandCardType.Active,
+        });
 
         Hide();
     }
-    
+
 
     private void OnClick_Summon()
     {
@@ -153,13 +158,13 @@ public class Old_Panel_CardOptions : Singleton<Old_Panel_CardOptions>
     {
         var myIndex = Client_DueManager.myIndex;
         var cardGuild = _cardGuid;
-        
-        Networks.Network.Request.Fighting.ReleaseHandCard(new ()
+
+        Networks.Network.Request.Fighting.ReleaseHandCard(new Request_ReleaseHandCard()
         {
             cardId = long.Parse(cardGuild),
-            releaseType = "SUMMON",
+            mode = ReleaseHandCardType.Summon
         });
-        
+
 
         Hide();
     }
@@ -184,12 +189,13 @@ public class Old_Panel_CardOptions : Singleton<Old_Panel_CardOptions>
 
         // Server_DueManager.main.InHand_Use(myIndex, cardGuild, InHand_CardUse.Set);
 
-        Networks.Network.Request.Fighting.ReleaseHandCard(new ()
+        Networks.Network.Request.Fighting.ReleaseHandCard(new Request_ReleaseHandCard()
         {
             cardId = long.Parse(cardGuild),
-            releaseType = "SET",
+            mode = ReleaseHandCardType.Set
         });
-        
+
+
         Hide();
     }
 

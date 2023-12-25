@@ -52,20 +52,36 @@ public class Screen_MainHome : Screen
 
     IEnumerator LoadAvt(string url)
     {
-        var www = new WWW(url);
-        yield return www;
+        yield return null;
 
-        uiAvt.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height),
-            new Vector2(0, 0));
+        // if (string.IsNullOrEmpty(url))
+        // {
+        //     Debug.LogWarning("URL Image null");
+        //     yield return null;
+        // }
+        //
+        // var www = new WWW(url);
+        // yield return www;
+        //
+        // uiAvt.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height),
+        //     new Vector2(0, 0));
     }
 
     IEnumerator LoadCover(string url)
     {
-        var www = new WWW(url);
-        yield return www;
+        yield return null;
 
-        uiCover.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height),
-            new Vector2(0, 0));
+        // if (string.IsNullOrEmpty(url))
+        // {
+        //     Debug.LogWarning("URL Image null");
+        //     yield return null;
+        // }
+        //
+        // var www = new WWW(url);
+        // yield return www;
+        //
+        // uiCover.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height),
+        //     new Vector2(0, 0));
     }
 
     private void ToScreen_Battle()

@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using QBPlugins.ScreenFlow;
 using UnityEngine;
 
 namespace Networks
@@ -34,15 +35,18 @@ namespace Networks
             {
                 Debug.Log($"<color=yellow>Response:</color> {message}");
             }
-            
+
             var msgObject = JsonConvert.DeserializeObject<MessageResponse>(message);
-            
+
 
             var data = msgObject.data;
 
-            if (!string.IsNullOrEmpty(msgObject.error))
+
+            var exceptErrorNotify = new List<string>() { MessageID.LOGIN_BY_PASSWORD, MessageID.RECONNECT_GAME_SESSION };
+            
+            if (!string.IsNullOrEmpty(msgObject.error) && exceptErrorNotify.All(m => m != msgObject.id))
             {
-                Popup_ErrorNotify.Open($"Server Eror: {msgObject.id}", content: $"{msgObject.error}");
+                Popup_ErrorNotify.Open($"Server Error: {msgObject.id}", content: $"{msgObject.error}");
             }
 
             switch (msgObject.id)
@@ -101,7 +105,7 @@ namespace Networks
                 case MessageID.DRAW_DECK_CARD:
                     HandleResponse.DrawCheckCard((JObject)data);
                     break;
-                
+
                 case MessageID.END_GAME:
                     HandleResponse.EndGame((JObject)data);
                     break;
@@ -109,12 +113,28 @@ namespace Networks
                 case MessageID.RELEASE_HAND_CARD:
                     HandleResponse.Fighting.ReleaseHandCard((JObject)data);
                     break;
-                
+
+                case MessageID.CARD_EFFECT:
+                    HandleResponse.On_CardEffect((JObject)data);
+                    break;
+
                 case MessageID.ATTACK_TABLE_DIRECT:
                     HandleResponse.Fighting.AttackTableDirect((JObject)data);
                     break;
                 case MessageID.ATTACK_TABLE_CARD:
                     HandleResponse.Fighting.AttackTableCard((JObject)data);
+                    break;
+
+                case MessageID.CHANGE_TABLE_CARD_POSITION:
+                    HandleResponse.Fighting.ChangeTableCardPosition((JObject)data);
+                    break;
+
+
+                case MessageID.RECONNECT_GAME_SESSION:
+                    HandleResponse.ReconnectGameSession((JObject)data, msgObject.error);
+                    break;
+                case MessageID.LOAD_GAME_STATE:
+                    HandleResponse.LoadGameState((JObject)data);
                     break;
 
 

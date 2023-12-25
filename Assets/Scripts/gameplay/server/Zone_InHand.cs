@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using event_name;
 using Gameplay.card.ui;
 using Networks;
+using Sirenix.OdinInspector;
+using TigerForge;
+using UnityEngine;
 
 [Serializable]
 public class Zone_InHand
 {
     private const int Capacity = 6;
-    public List<CardSpace> spaces;
+    [ShowInInspector] public List<CardSpace> spaces;
 
     public Zone_InHand()
     {
@@ -36,6 +40,40 @@ public class Zone_InHand
         {
             card = card,
         });
+    }
+
+    public void Sync(int playerIndex, List<SyncTemp_HandCard> cards)
+    {
+        foreach (var tempCard in cards)
+        {
+            if (spaces.All(space => space.card.Guid != tempCard.id.ToString()))
+            {
+                Server_DueManager.main.Draw(playerIndex, new List<ServerCard>() { tempCard.To_ServerCard() });
+            }
+        }
+    }
+
+    public void SyncAmony(int playerIndex, int amount)
+    {
+        var missing = amount - spaces.Count;
+
+        if (missing > 0)
+        {
+            for (int i = 0; i < missing; i++)
+            {
+                Server_DueManager.main.Draw(1, new() { ServerCard.NewAnonymous() });
+            }
+        }
+        else if (missing < 0)
+        {
+            var removeCards = spaces.Take(Mathf.Abs(missing));
+            spaces.RemoveRange(0, Mathf.Abs(missing));
+
+            foreach (var removeCard in removeCards)
+            {
+                DueNotifier.Notify_InHandRemove(playerIndex, removeCard.card.Guid);
+            }
+        }
     }
 
     public int SearchIndex(string cardGuid)

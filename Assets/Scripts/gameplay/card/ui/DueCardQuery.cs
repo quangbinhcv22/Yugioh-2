@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gameplay.card.ui;
@@ -12,6 +11,8 @@ public static class DueCardQuery
 
     public static ServerCard InitCard(ServerCard card)
     {
+        if (Cards.Any(c => c.Guid == card.Guid)) return card; 
+        
         Cards.Add(card);
         return card;
     }
@@ -21,19 +22,25 @@ public static class DueCardQuery
         return Cards.FirstOrDefault(card => card.Guid == cardGuild);
     }
     
+    
+    public static CardConfig GetConfig(string cardGuild)
+    {
+        var code = Cards.FirstOrDefault(card => card.Guid == cardGuild).code;
+        return Network.Query.Config.GetCard(code);
+    }
 
     public static CardLocation Locate(string cardGuid)
     {
         var manager = Server_DueManager.main;
 
-        var locate1 = manager.player1.zone.Locate(cardGuid);
+        var locate1 = manager.self.zone.Locate(cardGuid);
         if (locate1.IsValid)
         {
             locate1.playerIndex = 0;
             return locate1;
         }
 
-        var locate2 = manager.player2.zone.Locate(cardGuid);
+        var locate2 = manager.opponent.zone.Locate(cardGuid);
         locate2.playerIndex = 1;
 
         return locate2;
@@ -42,7 +49,7 @@ public static class DueCardQuery
     public static CardSpace_Combat GetBattleInfo(string cardGuild)
     {
         var manager = Server_DueManager.main;
-        return manager.player1.zone.mainMonster.Get(cardGuild) ?? manager.player2.zone.mainMonster.Get(cardGuild);
+        return manager.self.zone.mainMonster.Get(cardGuild) ?? manager.opponent.zone.mainMonster.Get(cardGuild);
     }
 
 
@@ -81,8 +88,15 @@ public static class DueCardQuery
 
     public static bool IsAnonymousCard(string cardGuild)
     {
-        var result =long .Parse(cardGuild) <= 0;
+        if (string.IsNullOrEmpty(cardGuild)) return true;
+        
+        var result =long.Parse(cardGuild) <= 0;
         return result;
+    }
+    
+    public static bool IsAnonymousCode(string code)
+    {
+        return string.IsNullOrEmpty(code);
     }
 
 

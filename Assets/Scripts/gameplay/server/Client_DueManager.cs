@@ -68,7 +68,7 @@ public class Client_DueManager : MonoBehaviour
         if (phase is Phase.Battle)
         {
             // first turn
-            if (Networks.Network.Query.Fighting.IsFirstTun) return PhaseStatus.Disable;
+            if (Networks.Network.Query.Fighting.IsFirstTun){ return PhaseStatus.Disable;}
 
             var haveAttacker = GetPlayer(Team.Self).zone.mainMonster.HaveAttacker();
             if (haveAttacker && currentPhase is Phase.Main1) return PhaseStatus.Enable;

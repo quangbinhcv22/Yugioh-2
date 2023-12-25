@@ -14,10 +14,18 @@ public class HttpImage : MonoBehaviour
 
     IEnumerator LoadAvt(string url)
     {
-        var www = new WWW(url);
-        yield return www;
+        yield return null;
 
-        image.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height),
-            new Vector2(0, 0));
+        // if (string.IsNullOrEmpty(url))
+        // {
+        //     Debug.LogWarning("URL Image null");
+        //     yield return null;
+        // }
+        //
+        // var www = new WWW(url);
+        // yield return www;
+        //
+        // image.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height),
+        //     new Vector2(0, 0));
     }
 }

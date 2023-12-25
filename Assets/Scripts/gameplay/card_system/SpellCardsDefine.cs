@@ -24,3 +24,8 @@ public enum SpellCardType
     Field = 5,
     Ritual = 6,
 }
+
+public enum SpellType
+{
+    FIELD,
+}

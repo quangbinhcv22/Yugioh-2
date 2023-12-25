@@ -1,3 +1,4 @@
+using battle.define;
 using event_name;
 using Gameplay.board;
 using TigerForge;
@@ -27,7 +28,7 @@ public class PresentHandler_ChangePosition : Singleton<PresentHandler_ChangePosi
 
 public class Event_ChangePosition
 {
-    public int playerIndex;
+    public Team team;
     public string guid;
     public MonsterPosition position;
 }

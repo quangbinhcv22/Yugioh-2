@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace Networks
@@ -73,8 +74,9 @@ namespace Networks
                 Send(MessageID.MATCHING_ROOM_CONFIRM);
             }
 
-            public static void Matching_ReadyStartGame()
+            public static async void Matching_ReadyStartGame()
             {
+                // await UniTask.Delay(500);
                 Send(MessageID.MATCHING_ROOM_READY_START_GAME);
             }
 
@@ -176,6 +178,8 @@ namespace Networks
 
             public static void Matching_SelectOrderToGo(JObject data)
             {
+                Network.Request.Fighting.TestingSetCardDeckBeforeStartGame();
+
                 var response = data.ToObject<Response_SelectOrderToGo>();
 
                 var isSelf = response.player == Cached.playerInfo.id;

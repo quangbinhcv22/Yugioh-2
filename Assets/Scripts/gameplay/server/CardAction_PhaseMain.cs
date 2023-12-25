@@ -16,6 +16,10 @@ public class CardAction_PhaseMain : Singleton<CardAction_PhaseMain>, ISourceCard
     public List<string> summonThisTurn_Cards = new();
     public List<string> wasAttacker = new();
 
+    public void Notify_WasAttacker(string guild)
+    {
+        if (!wasAttacker.Contains(guild)) wasAttacker.Add(guild);
+    }
 
     protected override void OnEnable()
     {
@@ -50,7 +54,7 @@ public class CardAction_PhaseMain : Singleton<CardAction_PhaseMain>, ISourceCard
     {
         OnPhase();
     }
-    
+
     private void OnPhase()
     {
         var isOwnTurn = Networks.Network.Query.Fighting.IsOwnTurn;

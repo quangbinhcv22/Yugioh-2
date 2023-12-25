@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using battle.define;
+using Networks;
 using CardConfig = Networks.CardConfig;
 
 namespace Gameplay
@@ -19,7 +20,7 @@ namespace Gameplay
 
         public static string GetIllusKey(string id)
         {
-            var type = GetType_ById(id);
+            var type = Networks.Network.Query.Config.GetType_ByCode(id);
             switch (type)
             {
                 case CardType.None:
@@ -28,7 +29,7 @@ namespace Gameplay
                     return $"{id}";
                     break;
                 case CardType.Spell:
-                    return id;
+                    return $"{id}";
                     break;
                 case CardType.Trap:
                     break;
@@ -43,15 +44,10 @@ namespace Gameplay
 
         public static CardType GetType_ByGuid(string guid)
         {
-            var id = DueCardQuery.GetViewInfo(guid).code;
-            return GetType_ById(id);
+            var code = DueCardQuery.GetViewInfo(guid).code;
+            return Networks.Network.Query.Config.GetType_ByCode(code);
         }
         
-        public static CardType GetType_ById(string id)
-        {
-            if (id.Contains("sp")) return CardType.Spell;
-            return CardType.Monster;
-        }
 
 
         public static int GetAttackBase(string id)

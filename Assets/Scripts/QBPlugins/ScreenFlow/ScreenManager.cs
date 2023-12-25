@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -150,7 +151,19 @@ namespace QBPlugins.ScreenFlow
         private static void OnLoad(string screenKey, AsyncOperationHandle<GameObject> handle)
         {
             if (IsLoaded(screenKey)) return;
-            handle.Completed += operationHandle => { LoadedScreens.Add(screenKey, operationHandle.Result); };
+
+            try
+            {
+                handle.Completed += operationHandle =>
+                {
+                    LoadedScreens.Add(screenKey, operationHandle.Result);
+                };
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+                throw;
+            }
         }
 
         private static void Release(string screenKey)
@@ -181,9 +194,10 @@ namespace QBPlugins.ScreenFlow
         private static bool IsLoaded(string screenKey) => LoadedScreens.ContainsKey(screenKey);
         private static bool IsInstantiated(string screenKey) => InstantiatedScreens.ContainsKey(screenKey);
 
-        private static Screen CurrentWindow => !CurrentWindows.Any() ? null : CurrentWindows.Last();
+        public static Screen CurrentWindow => !CurrentWindows.Any() ? null : CurrentWindows.Last();
 
         private static bool HaveWindow => CurrentWindows.Any();
+        
 
         private static Screen GetInstantiated(string screenKey)
         {

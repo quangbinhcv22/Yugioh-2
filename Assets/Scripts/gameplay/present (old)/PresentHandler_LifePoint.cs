@@ -43,6 +43,7 @@ namespace gameplay.present
             switch (@event.reason)
             {
                 case Event_Changed_LifePoint.Reason.StartGame:
+                case Event_Changed_LifePoint.Reason.Sync:
                     UpdateImmediately(teamChanged);
                     break;
                 case Event_Changed_LifePoint.Reason.NewRound:
@@ -92,6 +93,7 @@ namespace gameplay.present
             StartGame = 1,
             NewRound = 2,
             Attack = 3,
+            Sync = 4,
         }
 
         public int playerIndex;

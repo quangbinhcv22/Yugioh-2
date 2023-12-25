@@ -93,6 +93,9 @@ public static class MessageID
     public const string SELECT_ORDER_TO_GO = "SELECT_ORDER_TO_GO";
 
 
+    public const string TESTING_SET_CARD_DECK_BEFORE_START_GAME = "TESTING_SET_CARD_DECK_BEFORE_START_GAME";
+    public const string TESTING_END_ALL_GAME_SESSIONS = "TESTING_END_ALL_GAME_SESSIONS";
+    
     public const string START_GAME = "START_GAME";
     public const string START_ROUND = "START_ROUND";
     public const string ON_PHASE = "ON_PHASE";
@@ -100,6 +103,9 @@ public static class MessageID
     
     public const string ATTACK_TABLE_CARD = "ATTACK_TABLE_CARD";
     public const string ATTACK_TABLE_DIRECT = "ATTACK_TABLE_DIRECT";
+    public const string CHANGE_TABLE_CARD_POSITION = "CHANGE_TABLE_CARD_POSITION";
+    
+    public const string CARD_EFFECT = "CARD_EFFECT";
 
 
     public const string DISCONNECT = "DISCONNECT";
@@ -107,6 +113,9 @@ public static class MessageID
     public const string ACTIVE_BATTLE_PHASE = "ACTIVE_BATTLE_PHASE";
     public const string END_PHASE = "END_PHASE";
     public const string RELEASE_HAND_CARD = "RELEASE_HAND_CARD";
+    
+    public const string RECONNECT_GAME_SESSION = "RECONNECT_GAME_SESSION";
+    public const string LOAD_GAME_STATE = "LOAD_GAME_STATE";
     
     public const string END_GAME = "END_GAME";
 }

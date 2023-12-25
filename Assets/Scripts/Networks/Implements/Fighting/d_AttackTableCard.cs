@@ -68,18 +68,10 @@ namespace Networks
                     var monsterAttacker = response.sourceCard.Guid;
                     var monsterDefender = response.targetCard.Guid;
 
+                    var defender = DueCardQuery.GetData(monsterDefender);
+                    if(string.IsNullOrEmpty(defender.code)) defender.code = response.targetCard.code;
 
-                    var monsterDie = response.destroyedCards;
-                    if (monsterDie.Any(m => m.Guid == monsterAttacker))
-                    {
-                        Server_DueManager.main.MonsterDie(attackPlayerIndex, monsterAttacker);
-                    }
-
-                    if (monsterDie.Any(m => m.Guid == monsterDefender))
-                    {
-                        Server_DueManager.main.MonsterDie(damagedPlayerIndex, monsterDefender);
-                    }
-
+                    
                     Server_DueManager.main.ModifyHp_ByAttack(damagedPlayerIndex, -Mathf.Abs(response.damage));
 
 
@@ -90,7 +82,6 @@ namespace Networks
                         defenderGuid = monsterDefender,
                         damagedPlayerIndex = damagedPlayerIndex,
                         damage = response.damage,
-                        dieCards = monsterDie.Select(m => m.Guid.ToString()).ToList()
                     });
                 }
             }
